@@ -1,23 +1,44 @@
 #include "FastSimulation/PPSFastSim/interface/PPSToFDetector.h"
 #include <math.h>
-PPSToFDetector::PPSToFDetector(int ncellx,int ncelly, double cellw,double cellh,double pitchx,double pitchy,double pos, int res):
+PPSToFDetector::PPSToFDetector(int ncellx,int ncelly, std::vector<double>& cellw,double cellh,double pitchx,double pitchy,double pos, int res):
         NCellX(ncellx),NCellY(ncelly),CellW(cellw),CellH(cellh),PitchX(pitchx),PitchY(pitchy),fToFResolution(res),DetPosition(pos) {
+// the vertical positions starts from the negative(bottom) to the positive(top) corner
+// vector index points to the row number from below
+     CellRow.push_back(std::pair<double,double>(-CellH/2.,CellH/2.));
+// vector index points to the column number
+     for(int i=0;i<NCellX;i++) {
+        double x1 = 0., x2 = 0.;  
+        if(i==0) x1 = -(DetPosition+DetW);
+        else x1 = -DetPosition+DetW; //DetPosition - shift the limit of a column depending on the detector position
+        x2 = x1-CellW.at(i);
+        DetW += (x2-x1)-PitchX; 
+         std::cout << i << " - DetPosition: " << DetPosition << " - DetW: "   << DetW << " - CellW: "  << CellW.at(i) <<  " - x1: "  << x1 << " - x2: "  << x2 << std::endl;  
+        CellColumn.push_back(std::pair<double,double>(x1,x2));
+     }
+//diamond geometry
+     DetH=NCellY*CellH;
+     DetW=-DetW-2*PitchX; 
+};
+
+PPSToFDetector::PPSToFDetector(int ncellx,int ncelly, double cellwq,double cellh,double pitchx,double pitchy,double pos, int res):
+        NCellX(ncellx),NCellY(ncelly),CellWq(cellwq),CellH(cellh),PitchX(pitchx),PitchY(pitchy),fToFResolution(res),DetPosition(pos) {
 //
-     DetW=NCellX*CellW+(NCellX-1)*PitchX;
+     DetW=NCellX*CellWq+(NCellX-1)*PitchX;
      DetH=NCellY*CellH+(NCellY-1)*PitchY;
 // the vertical positions starts from the negative(bottom) to the positive(top) corner
-     for(int i=0;i<NCellY;i++) {
 // vector index points to the row number from below
+     for(int i=0;i<NCellY;i++) {
         double y1=CellH*(i-NCellY/2.)+PitchY*(i-(NCellY-1)/2.);
         double y2=y1+CellH;
         CellRow.push_back(std::pair<double,double>(y1,y2));
      }
 // vector index points to the column number
      for(int i=0;i<NCellX;i++) {
-        double x1 = -(CellW*i+PitchX*i);
+        double x1 = -(CellWq*i+PitchX*i);
         x1-=DetPosition; // shift the limit of a column depending on the detector position
-        double x2 = x1-CellW;
+        double x2 = x1-CellWq;
         CellColumn.push_back(std::pair<double,double>(x1,x2));
+        std::cout << i << " - DetPosition: " << DetPosition << " - DetW: "   << DetW << " - CellW: "  << CellWq <<  " - x1: "  << x1 << " - x2: "  << x2 << std::endl;  
      }
 };
 void PPSToFDetector::AddHit(double x, double y, double tof) {

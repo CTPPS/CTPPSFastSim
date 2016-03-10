@@ -152,7 +152,7 @@ class Validation : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 		TH2F *h_PPS_xVsy_ARMBTrkDet1, *h_PPS_xVsy_ARMBTrkDet2, *h_PPS_xVsy_ARMBToFDet;
 		TH1F *h_PPS_etaARMF, *h_PPS_etaARMB, *h_PPS_phiARMF, *h_PPS_phiARMB, *h_PPS_thetaXARMF, *h_PPS_thetaYARMF, *h_PPS_thetaXARMB, *h_PPS_thetaYARMB;  
 		TH1F *h_PPS_xVertices, *h_PPS_yVertices, *h_PPS_zVertices; 
-
+        TH2F *h_xi_armB_GenReco,*h_xi_armF_GenReco,*h_t_armB_GenReco,*h_t_armF_GenReco ; 
 		// PPS Gen Histograms
 		TH1F* h_PPS_Gen_xiARMF,*h_PPS_Gen_tARMF;
 		TH1F* h_PPS_Gen_etaARMF,*h_PPS_Gen_phiARMF;	
@@ -180,7 +180,7 @@ class Validation : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 		edm::Handle<PPSSpectrometer<PPSReco> > ppsReco;
 		edm::EDGetTokenT<PPSSpectrometer<PPSReco> > ppsRecoToken;
 
-		double EBeam_;
+		//double EBeam_;
 
 };
 
@@ -215,7 +215,9 @@ Validation::Validation(const edm::ParameterSet& iConfig):
 {
 	//now do what ever initialization is needed
 	usesResource("TFileService");
-
+    //double fBeamSizeAtToF = iConfig.getParameter<double>("BeamSizeAtToF"); // beam sigma(X) at timing station in mm
+    //double fToFInsertion = iConfig.getParameter<double>("ToFInsertion"); // Number of sigms (X) from the beam for the tof
+    //double fToFCellW = iConfig.getParameter<double>("ToFCellWidth"); // tof  width in mm                      
 
 }
 
@@ -274,7 +276,6 @@ void Validation::PPSResolutionInfo(const edm::Event& iEvent, const edm::EventSet
 Validation::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 	GenPPSInfo(iEvent, iSetup);
-
 
 	using namespace edm;
 	iEvent.getByToken(jetsToken, jets);
@@ -341,7 +342,7 @@ Validation::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		h_PPS_xVsy_ARMBTrkDet2->Fill(ppsReco->ArmB.TrkDet2.at(k).X,ppsReco->ArmB.TrkDet2.at(k).Y);
 	}
 	for(size_t k=0;k<ppsReco->ArmF.ToFDet.size();++k) {
-		h_PPS_xVsy_ARMFToFDet->Fill(ppsReco->ArmF.ToFDet.at(k).X,ppsReco->ArmF.ToFDet.at(k).Y);
+        h_PPS_xVsy_ARMFToFDet->Fill(ppsReco->ArmF.ToFDet.at(k).X,ppsReco->ArmF.ToFDet.at(k).Y);
 		h_PPS_ToF_ARMFToFDet->Fill(ppsReco->ArmF.ToFDet.at(k).ToF);
 	}
 	for(size_t k=0;k<ppsReco->ArmB.ToFDet.size();++k) {
@@ -355,6 +356,7 @@ Validation::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		h_PPS_yVertices->Fill(ppsReco->Vertices->at(k).y);
 		h_PPS_zVertices->Fill(ppsReco->Vertices->at(k).z);
 	}
+        //std::cout << " /////////////////// 1 - " << ppsReco->ArmF.Tracks.size() << std::endl;
 	for(size_t i=0;i<ppsReco->ArmF.Tracks.size();++i) {
 		h_PPS_xiARMF->Fill(ppsReco->ArmF.Tracks.at(i).xi);
 		h_PPS_tARMF->Fill(ppsReco->ArmF.Tracks.at(i).t);
@@ -366,8 +368,26 @@ Validation::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		h_PPS_tofARMF->Fill(ppsReco->ArmF.Tracks.at(i).ToF.ToF);
 		h_PPS_xVsy_ARMFDt1->Fill(ppsReco->ArmF.Tracks.at(i).Det1.X,ppsReco->ArmF.Tracks.at(i).Det1.Y);
 		h_PPS_xVsy_ARMFDt2->Fill(ppsReco->ArmF.Tracks.at(i).Det2.X,ppsReco->ArmF.Tracks.at(i).Det2.Y);
-		if(ppsReco->ArmF.Tracks.at(i).ToF.ToF!=0)h_PPS_xVsy_ARMFToF->Fill(ppsReco->ArmF.Tracks.at(i).ToF.X,ppsReco->ArmF.Tracks.at(i).ToF.Y); 
-	}
+		if(ppsReco->ArmF.Tracks.at(i).ToF.ToF!=0){
+            h_PPS_xVsy_ARMFToF->Fill(ppsReco->ArmF.Tracks.at(i).ToF.X,ppsReco->ArmF.Tracks.at(i).ToF.Y); 
+        }
+    }
+    if(ppsReco->ArmB.Tracks.size() <= ppsGen->ArmB.genParticles.size()) { 
+    	for(size_t i=0;i<ppsReco->ArmB.Tracks.size();++i) {
+            if(ppsReco->ArmB.Tracks.size()!=0&&ppsGen->ArmB.genParticles.size()!=0){
+                h_xi_armB_GenReco->Fill(ppsGen->ArmB.genParticles.at(i).xi , ppsReco->ArmB.Tracks.at(i).xi);
+                h_t_armB_GenReco->Fill(ppsGen->ArmB.genParticles.at(i).t , ppsReco->ArmB.Tracks.at(i).t);
+            }
+        }
+    }
+    if(ppsReco->ArmF.Tracks.size() <= ppsGen->ArmF.genParticles.size()) { 
+    	for(size_t i=0;i<ppsReco->ArmF.Tracks.size();++i) {
+            if(ppsReco->ArmF.Tracks.size()!=0){
+                h_xi_armF_GenReco->Fill(ppsGen->ArmF.genParticles.at(i).xi , ppsReco->ArmF.Tracks.at(i).xi);
+                h_t_armF_GenReco->Fill(ppsGen->ArmF.genParticles.at(i).t , ppsReco->ArmF.Tracks.at(i).t);
+            }
+        }
+    } 
 	for(size_t j=0;j<ppsReco->ArmB.Tracks.size();++j) {
 		h_PPS_xiARMB->Fill(ppsReco->ArmB.Tracks.at(j).xi);
 		h_PPS_tARMB->Fill(ppsReco->ArmB.Tracks.at(j).t);
@@ -390,6 +410,10 @@ Validation::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	void 
 Validation::beginJob()
 {
+    h_xi_armB_GenReco = fs->make<TH2F>( "xi_armB_GenReco" , "PPS_GenReco_xiARMB; #xi_{Gen}; #xi_{Reco}" , 100, 0., .30, 100, 0., .30 );
+    h_xi_armF_GenReco = fs->make<TH2F>( "xi_armF_GenReco" , "PPS_GenReco_xiARMB; #xi_{Gen}; #xi_{Reco}" , 100, 0., .30, 100, 0., .30 );
+	h_t_armB_GenReco  = fs->make<TH2F>( "t_armB_GenReco" , "PPS_GenReco_tARMB; t [GeV^{2}]_{Gen};t [GeV^{2}]_{Reco}", 100, .0, 3.0, 100, .0, 3.0 );
+	h_t_armF_GenReco  = fs->make<TH2F>( "t_armF_GenReco" , "PPS_GenReco_tARMF; t [GeV^{2}]_{Gen};t [GeV^{2}]_{Reco}", 100, .0, 3.0, 100, .0, 3.0 );
 	h_PPS_xiARMF = fs->make<TH1F>( "PPS_xiARMF" , "PPS_xiARMF; #xi; nEvents" , 100, 0., .50 ); 
 	h_PPS_tARMF = fs->make<TH1F>( "PPS_tARMF" , "PPS_tARMF; t [GeV^{2}]; nEvents" , 100, .0, 3.0 );
 	h_PPS_xiVstARMF = fs->make<TH2F>( "PPS_xiVstARMF" , "PPS_xiVstARMF; #xi ; t [GeV^{2}]" , 100, 0., .50 , 100, .0, 3.0 );
@@ -400,7 +424,12 @@ Validation::beginJob()
 	h_PPS_tofARMF = fs->make<TH1F>( "PPS_tofARMF" , "Hits in tracks - PPS_tofARMF;  ToF [#mus]; nEvents" , 100, 715., 722. ); 
 	h_PPS_xVsy_ARMFDt1 = fs->make<TH2F>( "PPS_xVsy_ARMFDt1" , "Hits in tracks - PPS x_vs_y_{ARMFDt1}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
 	h_PPS_xVsy_ARMFDt2 = fs->make<TH2F>( "PPS_xVsy_ARMFDt2" , "Hits in tracks - PPS x_vs_y_{ARMFDt2}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
-	h_PPS_xVsy_ARMFToF = fs->make<TH2F>( "PPS_xVsy_ARMFToF" , "Hits in tracks - PPS x_vs_y_{ARMFToF}; x [mm]; y [mm]" ,  5, -16.75, -1.75,4,-6.0,6.0);
+    const int nXbins = 8; 
+    //double xbin[nXbins+1] = {-18.195, -13.995, -9.795, -7.445, -5.695, -4.535, -3.515, -2.505, -1.695};
+    double xbin[nXbins+1+1] = {-20., -18.195, -13.995, -9.795, -7.445, -5.695, -4.535, -3.515, -2.505, -1.695};
+    double ybin = 4.2; 
+	h_PPS_xVsy_ARMFToF = fs->make<TH2F>( "PPS_xVsy_ARMFToF" , "Hits in tracks - PPS x_vs_y_{ARMFToF}; x [mm]; y [mm]" , nXbins+2, xbin,3,-1.5*ybin,1.5*ybin); //diamond
+	//h_PPS_xVsy_ARMFToF = fs->make<TH2F>( "PPS_xVsy_ARMFToF" , "Hits in tracks - PPS x_vs_y_{ARMFToF}; x [mm]; y [mm]" ,  5, -16.75, -1.75,4,-6.0,6.0);//quartz
 	h_PPS_xiARMB = fs->make<TH1F>( "PPS_xiARMB" , "PPS_xiARMB; #xi; nEvents" , 100, 0., .50 ); 
 	h_PPS_tARMB = fs->make<TH1F>( "PPS_tARMB" , "PPS_tARMB; t [GeV^{2}]; nEvents" , 100, .0, 3.0 ); 
 	h_PPS_xiVstARMB = fs->make<TH2F>( "PPS_xiVstARMB" , "PPS_xiVstARMB; #xi ; t [GeV^{2}]" , 100, 0., .50 , 100, .0, 3.0 );
@@ -411,7 +440,8 @@ Validation::beginJob()
 	h_PPS_tofARMB = fs->make<TH1F>( "PPS_tofARMB" , "Hits in tracks - PPS_tofARMB; ToF [#mus]; nEvents" , 100, 715., 722. ); 
 	h_PPS_xVsy_ARMBDt1 = fs->make<TH2F>( "PPS_xVsy_ARMBDt1" , "Hits in tracks - PPS x_vs_y_{ARMBDt1}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
 	h_PPS_xVsy_ARMBDt2 = fs->make<TH2F>( "PPS_xVsy_ARMBDt2" , "Hits in tracks - PPS x_vs_y_{ARMBDt2}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
-	h_PPS_xVsy_ARMBToF = fs->make<TH2F>( "PPS_xVsy_ARMBToF" , "Hits in tracks - PPS x_vs_y_{ARMBToF}; x [mm]; y [mm]" , 5, -16.75, -1.75,4,-6.0,6.0);
+	h_PPS_xVsy_ARMBToF = fs->make<TH2F>( "PPS_xVsy_ARMBToF" , "Hits in tracks - PPS x_vs_y_{ARMBToF}; x [mm]; y [mm]" , nXbins+2, xbin,3,-1.5*ybin,1.5*ybin);//diamond
+	//h_PPS_xVsy_ARMBToF = fs->make<TH2F>( "PPS_xVsy_ARMBToF" , "Hits in tracks - PPS x_vs_y_{ARMBToF}; x [mm]; y [mm]" , 5, -16.75, -1.75,4,-6.0,6.0);
 
 	h_PPS_xVertices = fs->make<TH1F>( "PPS_xVertices" , "PPS_xVertices; x_{vPPS} [cm]; nEvents" , 100, -.40, .20 ); 
 	h_PPS_yVertices = fs->make<TH1F>( "PPS_yVertices" , "PPS_yVertices; y_{vPPS} [cm]; nEvents" , 100, -.10, .10 ); 
@@ -419,11 +449,13 @@ Validation::beginJob()
 
 	h_PPS_xVsy_ARMFTrkDet1 = fs->make<TH2F>( "PPS_xVsy_ARMFTrkDet1" , "All hits - PPS x_vs_y_{TrkDet1_ARMF}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
 	h_PPS_xVsy_ARMFTrkDet2 = fs->make<TH2F>( "PPS_xVsy_ARMFTrkDet2" , "All hits - PPS x_vs_y_{TrkDet2_ARMF}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
-	h_PPS_xVsy_ARMFToFDet = fs->make<TH2F>( "PPS_xVsy_ARMFToFDet" , "All hits - PPS x_vs_y_{ARMFToFDet}; x [mm]; y [mm]" , 5, -16.75, -1.75,4,-6.0,6.0);
+	h_PPS_xVsy_ARMFToFDet = fs->make<TH2F>( "PPS_xVsy_ARMFToFDet" , "All hits - PPS x_vs_y_{ARMFToFDet}; x [mm]; y [mm]" , nXbins+2, xbin,3,-1.5*ybin,1.5*ybin);//diamond
+	//h_PPS_xVsy_ARMFToFDet = fs->make<TH2F>( "PPS_xVsy_ARMFToFDet" , "All hits - PPS x_vs_y_{ARMFToFDet}; x [mm]; y [mm]" , 5, -16.75, -1.75,4,-6.0,6.0);
 	h_PPS_ToF_ARMFToFDet = fs->make<TH1F>( "PPS_ToF_ARMFToFDet" , "All hits - PPS_ToF_ARMFToFDet;  ToF [#mus]; nEvents" , 100, 700., 740. );
 	h_PPS_xVsy_ARMBTrkDet1 = fs->make<TH2F>( "PPS_xVsy_ARMBTrkDet1" , "All hits - PPS x_vs_y_{TrkDet1_ARMB}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
 	h_PPS_xVsy_ARMBTrkDet2 = fs->make<TH2F>( "PPS_xVsy_ARMBTrkDet2" , "All hits - PPS x_vs_y_{TrkDet2_ARMB}; x [mm]; y [mm]" , 22, -25.0, -3.0,18,-9.0,9.0 );
-	h_PPS_xVsy_ARMBToFDet = fs->make<TH2F>( "PPS_xVsy_ARMBToFDet" , "All hits - PPS x_vs_y_{ARMBToFDet}; x [mm]; y [mm]" , 5, -16.75, -1.75,4,-6.0,6.0);
+	h_PPS_xVsy_ARMBToFDet = fs->make<TH2F>( "PPS_xVsy_ARMBToFDet" , "All hits - PPS x_vs_y_{ARMBToFDet}; x [mm]; y [mm]" , nXbins+2, xbin,3,-1.5*ybin,1.5*ybin);//diamond
+	//h_PPS_xVsy_ARMBToFDet = fs->make<TH2F>( "PPS_xVsy_ARMBToFDet" , "All hits - PPS x_vs_y_{ARMBToFDet}; x [mm]; y [mm]" , 5, -16.75, -1.75,4,-6.0,6.0);
 	h_PPS_ToF_ARMBToFDet = fs->make<TH1F>( "PPS_ToF_ARMBToFDet" , "All hits - PPS_ToF_ARMBToFDet;  ToF [#mus]; nEvents" , 100, 700., 740. );
 
 	//Gen PPS histo
@@ -454,6 +486,15 @@ Validation::beginJob()
 	h_jet_pt           = fs->make<TH1F>( "h_jet_pt",           "h_jet_pt", 200,  0.0, 100. );
 
 	// set histos parameters
+    h_xi_armB_GenReco->SetOption("COLZ");
+    h_xi_armF_GenReco->SetOption("COLZ");
+    h_t_armB_GenReco->SetOption("COLZ");
+    h_t_armF_GenReco->SetOption("COLZ");
+    h_xi_armB_GenReco->SetStats(kFALSE);
+    h_xi_armF_GenReco->SetStats(kFALSE);
+    h_t_armB_GenReco->SetStats(kFALSE);
+    h_t_armF_GenReco->SetStats(kFALSE);
+    //
 	h_PPS_xVsy_ARMFDt1->SetOption("COLZ");
 	h_PPS_xVsy_ARMFDt2->SetOption("COLZ");
 	h_PPS_xVsy_ARMFToF->SetOption("COLZ");
