@@ -42,8 +42,8 @@ def customise(process):
 	print 'Setting CT-PPS FastSim'
 	ppssim_beam_options = cms.PSet(
   			Verbosity = cms.untracked.int32(0),
-               	         Beam1File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB1_Beta0.60_6.5TeV_CR142.5_v6.503.tfs"),
-                         Beam2File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB2_Beta0.60_6.5TeV_CR142.5_v6.503.tfs"),
+               	         Beam1File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB1_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
+                         Beam2File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB2_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
                          Beam1Direction = cms.int32(1),
                          Beam2Direction = cms.int32(1),
                          SmearEnergy    = cms.bool(E_smear),
@@ -57,7 +57,7 @@ def customise(process):
                          ShowBeamLine   = cms.untracked.bool(False),
                          SimBeamProfile = cms.untracked.bool(False),
                          CrossAngleCorr = cms.bool(useCR),
-                         CrossingAngle  = cms.double(142.5) #in mrad
+                         CrossingAngle  = cms.double(205.0) #in mrad
                          )
 
 	ppssim_detector_options = cms.PSet(
