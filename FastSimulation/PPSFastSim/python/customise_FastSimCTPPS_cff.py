@@ -42,9 +42,9 @@ def customise(process):
 	print 'Setting CT-PPS FastSim'
 	ppssim_beam_options = cms.PSet(
   			Verbosity = cms.untracked.int32(0),
-               	         Beam1File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB1_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
+                         Beam1File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB1_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
                          Beam2File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB2_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
-                         Beam1Direction = cms.int32(1),
+			 Beam1Direction = cms.int32(1),
                          Beam2Direction = cms.int32(1),
                          SmearEnergy    = cms.bool(E_smear),
                          SmearAngle     = cms.bool(Ang_smear),
@@ -59,14 +59,22 @@ def customise(process):
                          CrossAngleCorr = cms.bool(useCR),
                          CrossingAngle  = cms.double(205.0) #in mrad
                          )
-
+	ppssim_tofDiamond = cms.PSet(
+                         ToFGeometry       = cms.string("diamond"),
+                         ToFCellWidth      = cms.untracked.vdouble(0.81, 0.91, 1.02, 1.16, 1.75, 2.35, 4.2, 4.2), # tof cell width in mm #move to vector - diamond geometry
+                         ToFNCellX         = cms.int32(8),      # number of cells in X
+                         ToFNCellY         = cms.int32(1),      # number of cells in Y
+                         )
+	ppssim_tofQuartz = cms.PSet(
+                         ToFGeometry       = cms.string("quartz"),
+                         ToFCellWidth      = cms.untracked.vdouble(3.0), # tof cell width in mm #move to vector - diamond geometry
+                         ToFNCellX         = cms.int32(5),      # number of cells in X
+                         ToFNCellY         = cms.int32(4),      # number of cells in Y
+                         )
 	ppssim_detector_options = cms.PSet(
                          TrackerWidth      = cms.double(20.0), # tracker width in mm
                          TrackerHeight     = cms.double(18.0), # tracker height in mm
-                         ToFCellWidth      = cms.double(3.0), # tof cell width in mm
-                         ToFCellHeight     = cms.double(3.0), # tof cell height in mm
-                         ToFNCellX         = cms.int32(5),      # number of cells in X
-                         ToFNCellY         = cms.int32(4),      # number of cells in Y
+                         ToFCellHeight     = cms.double(4.2), # tof cell height in mm
                          ToFPitchX         = cms.double(100),  # pitch between cells in X in microns
                          ToFPitchY         = cms.double(100),  # pitch between cells in Y in microns
                          TrackerInsertion  = cms.double(15), # Number of sigmas (X) from the beam for the tracker
@@ -113,6 +121,8 @@ def customise(process):
 
 	process.ppssim = cms.EDProducer('PPSProducer',
 					ppssim_beam_options,
+                    ppssim_tofDiamond,
+                    #ppssim_tofQuartz,
                     ppssim_detector_options,
                     ppssim_general_options,
 					genSource = cms.InputTag("generatorSmeared") # for HepMC event -> no pileup events
@@ -124,13 +134,10 @@ def customise(process):
 	process.ppssim_step = cms.Path(process.generator+process.ppssim)#CTPPS
 	process.generation_step.replace(process.generator,process.generator * process.VtxSmeared)#CTPPS
 
-	# CMSSW_7_6_0_pre1
+	# CMSSW_7_6_0_pre1 or greather 
  	process.schedule.insert(6,process.ppssim_step)	
 
-
 	return (process)
-
-
 
 def customise_pu_protons_ctpps(process):
 	
