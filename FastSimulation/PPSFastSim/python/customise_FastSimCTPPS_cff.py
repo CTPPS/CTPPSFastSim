@@ -2,9 +2,9 @@ import FWCore.ParameterSet.Config as cms
 import math
 
 #common stuff here
-det1 = 203.827   #position of first tracker detector
-det2 = 212.550
-tof  = 215.7   #position of time of flight detector
+det1 = 203.8   #position of first tracker detector
+det2 = 215.
+tof  = 215.5   #position of time of flight detector
 trklen = 10.
 hit_smear= True
 Ang_smear= True
@@ -18,11 +18,15 @@ det2xoffset = 0.
 phi_min = -math.pi
 phi_max =  math.pi
 
-VertexX = cms.double(0.)
-VertexY = cms.double(0.)
-VertexZ = cms.double(0.)
-
-
+if vtx_smear:
+#use vertex from NominalCollision2015VtxSmearingParameters
+   VertexX = 0.0322
+   VertexY = 0.
+   VertexZ = 0.
+else:
+   VertexX = 0.
+   VertexY = 0.
+   VertexZ = 0.
 
 def customise(process):
 	######## CTPPS
@@ -30,15 +34,10 @@ def customise(process):
         process.load("FWCore.MessageLogger.MessageLogger_cfi")
         process.MessageLogger = cms.Service("MessageLogger")
 
-	if hasattr(process.VtxSmeared,"X0"):
-           VertexX = process.VtxSmeared.X0
-           VertexY = process.VtxSmeared.Y0
-           VertexZ = process.VtxSmeared.Z0
-
-        if hasattr(process.VtxSmeared,"MeanX"):
-           VertexX = process.VtxSmeared.MeanX
-           VertexY = process.VtxSmeared.MeanY
-           VertexZ = process.VtxSmeared.MeanZ
+	# Vertex position. Taken from EventVertexGenerators/python/VtxSmearedParameters_cfi, the closest from the MB vertex position used
+	process.VtxSmeared.MeanX = cms.double(VertexX)
+        process.VtxSmeared.MeanY = cms.double(VertexY)
+        process.VtxSmeared.MeanZ = cms.double(VertexZ)
 
 	print 'Setting CT-PPS FastSim'
 	ppssim_beam_options = cms.PSet(
@@ -103,9 +102,9 @@ def customise(process):
 
 	ppssim_general_options = cms.PSet(
                          UseHepMCProducer = cms.untracked.bool(True), 
-            	         VtxMeanX       = VertexX,
-                         VtxMeanY       = VertexY,
-                         VtxMeanZ       = VertexZ,
+            	         VtxMeanX       = cms.untracked.double(VertexX),
+                         VtxMeanY       = cms.untracked.double(VertexY),
+                         VtxMeanZ       = cms.untracked.double(VertexZ),
                          CollisionPoint = cms.string("IP5"),
                          TCL4Position    = cms.untracked.double(143.0),
                          TCL5Position    = cms.untracked.double(183.8),
