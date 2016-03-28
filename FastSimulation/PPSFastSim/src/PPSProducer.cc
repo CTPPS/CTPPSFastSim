@@ -95,9 +95,9 @@ PPSProducer::PPSProducer(const edm::ParameterSet& iConfig):fVerbose(false)
     int    beam2dir            = iConfig.getParameter<int>("Beam2Direction");
     bool   showbeam            = iConfig.getUntrackedParameter<bool>("ShowBeamLine",false);
     bool   simbeam             = iConfig.getUntrackedParameter<bool>("SimBeamProfile",false);
-    double fVtxMeanX           = iConfig.getUntrackedParameter<double>("VtxMeanX",0.);
-    double fVtxMeanY           = iConfig.getUntrackedParameter<double>("VtxMeanY",0.);
-    double fVtxMeanZ           = iConfig.getUntrackedParameter<double>("VtxMeanZ",0.);
+    double fVtxMeanX           = iConfig.getParameter<double>("VtxMeanX");
+    double fVtxMeanY           = iConfig.getParameter<double>("VtxMeanY");
+    double fVtxMeanZ           = iConfig.getParameter<double>("VtxMeanZ");
     string ip                  = iConfig.getParameter<string>("CollisionPoint");
     fVerbose                   = iConfig.getUntrackedParameter<int>("Verbosity",0);
     double fTrackerLength      = iConfig.getParameter<double>("TrackerLength");
