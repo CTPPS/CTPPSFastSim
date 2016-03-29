@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 import math
 
 #common stuff here
-det1 = 203.827    #position of first tracker detector
+det1 = 203.827   #position of first tracker detector
 det2 = 215.550
 tof  = 215.7   #position of time of flight detector
 trklen = 10.
@@ -18,12 +18,9 @@ det2xoffset = 0.
 phi_min = -math.pi
 phi_max =  math.pi
 
-
 VertexX = cms.double(0.)
 VertexY = cms.double(0.)
 VertexZ = cms.double(0.)
-
-
 
 def customise(process):
 	######## CTPPS
@@ -31,7 +28,7 @@ def customise(process):
         process.load("FWCore.MessageLogger.MessageLogger_cfi")
         process.MessageLogger = cms.Service("MessageLogger")
 
-        if hasattr(process.VtxSmeared,"X0"):
+	if hasattr(process.VtxSmeared,"X0"):
            VertexX = process.VtxSmeared.X0
            VertexY = process.VtxSmeared.Y0
            VertexZ = process.VtxSmeared.Z0
@@ -46,9 +43,9 @@ def customise(process):
 	print 'Setting CT-PPS FastSim'
 	ppssim_beam_options = cms.PSet(
   			Verbosity = cms.untracked.int32(0),
-                         Beam1File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB1_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
+               	         Beam1File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB1_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
                          Beam2File = cms.FileInPath("FastSimulation/PPSFastSim/data/LHCB2_Beta0.40_6.5TeV_CR205_v6.503.tfs"),
-			 Beam1Direction = cms.int32(1),
+                         Beam1Direction = cms.int32(1),
                          Beam2Direction = cms.int32(1),
                          SmearEnergy    = cms.bool(E_smear),
                          SmearAngle     = cms.bool(Ang_smear),
