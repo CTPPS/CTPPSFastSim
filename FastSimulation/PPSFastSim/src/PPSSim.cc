@@ -11,7 +11,7 @@ PPSSim::PPSSim(bool ext_gen): fExternalGenerator(ext_gen),
     fCrossingAngle(0.),fCrossAngleCorr(false),fKickersOFF(false),
     fDetectorClosestX(-2.),fMaxXfromBeam(-25),fMaxYfromBeam(10),
     fTrackerZPosition(0.),fTrackerLength(0.),fTrackerWidth(0.),fTrackerHeight(0.),
-    fToFWidth(0.),fToFHeight(0.),fToFCellW(0.),fToFCellH(0.),fToFPitchX(0.),fToFPitchY(0.),fToFNCellX(0),fToFNCellY(0),
+    fToFWidth(0.),fToFHeight(0.),fToFGeometry(""),fToFCellW(0.),fToFCellH(0.),fToFPitchX(0.),fToFPitchY(0.),fToFNCellX(0),fToFNCellY(0),
     fToFZPosition(0.),fTrackerInsertion(0.),fToFInsertion(0.),
     fTCL4Position1(0.),fTCL4Position2(0.),fTCL5Position1(0.),fTCL5Position2(0.),
     fSmearVertex(false),fVtxMeanX(0.),fVtxMeanY(0.),fVtxMeanZ(0.),fVtxSigmaX(0.),fVtxSigmaY(0.),fVtxSigmaZ(0.),
@@ -107,13 +107,23 @@ void PPSSim::BeginRun()
     //
     PPSTrkDetector* det1 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk1);
     PPSTrkDetector* det2 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk1);
-    TrkStation_F = new std::pair<PPSTrkDetector,PPSTrkDetector>(*det1,*det2);
-    ToFDet_F  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
 
+    std::cout << fToFNCellX << " ----------------------  "  << fToFGeometry << std::endl; 
+    TrkStation_F = new std::pair<PPSTrkDetector,PPSTrkDetector>(*det1,*det2);
+    if(fToFGeometry=="diamond") {
+        ToFDet_F  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
+        ToFDet_B  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
+    }
+    else if(fToFGeometry=="quartz"){
+    std::cout << " ----------------------  "  << fToFCellW.at(0) << std::endl; 
+        double fToFCellW_ = fToFCellW.at(0);
+        ToFDet_F  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW_,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
+        ToFDet_B  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW_,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
+    }
     det1 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk2);
     det2 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk2);
     TrkStation_B = new std::pair<PPSTrkDetector,PPSTrkDetector>(*det1,*det2);
-    ToFDet_B  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
+     
     fToFHeight = ToFDet_F->GetHeight();
     fToFWidth  = ToFDet_F->GetWidth();
     //   Check the overall kinematic limits

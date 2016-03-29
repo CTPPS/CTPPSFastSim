@@ -99,14 +99,15 @@ PPSProducer::PPSProducer(const edm::ParameterSet& iConfig):fVerbose(false)
     double fVtxMeanY           = iConfig.getParameter<double>("VtxMeanY");
     double fVtxMeanZ           = iConfig.getParameter<double>("VtxMeanZ");
     string ip                  = iConfig.getParameter<string>("CollisionPoint");
-    fVerbose            = iConfig.getUntrackedParameter<int>("Verbosity",0);
+    fVerbose                   = iConfig.getUntrackedParameter<int>("Verbosity",0);
     double fTrackerLength      = iConfig.getParameter<double>("TrackerLength");
     double fTrackerZPosition   = iConfig.getParameter<double>("TrackerZPosition");
     double fTrackerWidth       = iConfig.getParameter<double>("TrackerWidth"); // tracker width in mm
     double fTrackerHeight      = iConfig.getParameter<double>("TrackerHeight"); // tracker height in mm
     double fTrackerInsertion   = iConfig.getParameter<double>("TrackerInsertion"); // Number of sigms (X) from the beam for the tracker
     double fToFInsertion       = iConfig.getParameter<double>("ToFInsertion");     // Number of sigms (X) from the beam for the tof
-    double fToFCellW           = iConfig.getParameter<double>("ToFCellWidth");      // tof  width in mm
+    string tofgeometry          = iConfig.getParameter<string>("ToFGeometry"); 
+    std::vector<double> fToFCellW = iConfig.getUntrackedParameter<std::vector<double> >("ToFCellWidth");      // tof  width in mm - diamond
     double fToFCellH           = iConfig.getParameter<double>("ToFCellHeight");     // tof height in mm
     double fToFPitchX          = iConfig.getParameter<double>("ToFPitchX");         // cell pitch in X (in microns)
     double fToFPitchY          = iConfig.getParameter<double>("ToFPitchY");         // cell pitch in Y (in microns)
@@ -181,6 +182,7 @@ PPSProducer::PPSProducer(const edm::ParameterSet& iConfig):fVerbose(false)
     if (simbeam)  pps->set_GenBeamProfile();
     pps->set_VertexPosition(fVtxMeanX,fVtxMeanY,fVtxMeanZ);
     pps->set_CollisionPoint(ip);
+    pps->set_ToFGeometry(tofgeometry);
     pps->set_TrackerZPosition(fTrackerZPosition);
     pps->set_TrackerInsertion(fTrackerInsertion);
     pps->set_ToFInsertion(fToFInsertion);

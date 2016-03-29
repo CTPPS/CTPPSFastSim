@@ -7,6 +7,7 @@
 
 class PPSToFDetector {
       public:
+            PPSToFDetector(int ncellx,int ncelly, std::vector<double>& cellw,double cellh,double pitchx,double pitchy,double pos, int res);
             PPSToFDetector(int ncellx,int ncelly, double cellw,double cellh,double pitchx,double pitchy,double pos, int res);
             virtual ~PPSToFDetector() {};
 
@@ -40,7 +41,8 @@ class PPSToFDetector {
       private:
             int                 NCellX;
             int                 NCellY;
-            double              CellW; // width (X, horizontal dimension in mm)
+            double              CellWq; // width (X, horizontal dimension in mm) 
+            std::vector<double> CellW;//move to vector - diamond geometry
             double              CellH; // height(Y, vertical dimension in mm)
             double              PitchX; // distance (in X) between cells
             double              PitchY; // distance (in Y) between cells

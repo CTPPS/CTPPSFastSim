@@ -72,7 +72,8 @@ class PPSSim {
         {fMaxXfromBeam=x;fMaxYfromBeam=y;fDetectorClosestX=c;};
         void set_TrackerLength(double p)     {fTrackerLength=p;};
         void set_TrackerSize(double w,double h) {fTrackerWidth=w;fTrackerHeight=h;};
-        void set_ToFCellSize(double w,double h)     {fToFCellW=w;fToFCellH=h;};
+        void set_ToFGeometry(std::string tofgeometry)   {fToFGeometry=tofgeometry;};
+        void set_ToFCellSize(std::vector<double> w,double h)     {fToFCellW=w;fToFCellH=h;};
         void set_ToFPitch(double x, double y)       {fToFPitchX=x;fToFPitchY=y;};
         void set_ToFNCells(int x,int y)             {fToFNCellX=x;fToFNCellY=y;};
         void set_ToFZPosition(double p)       {fToFZPosition=p;};
@@ -207,7 +208,9 @@ class PPSSim {
         double         fTrackerHeight;
         double         fToFWidth;
         double         fToFHeight;
-        double         fToFCellW;
+        std::string    fToFGeometry;  
+        //double         fToFCellW;
+        std::vector<double> fToFCellW;
         double         fToFCellH;
         double         fToFPitchX;
         double         fToFPitchY;
