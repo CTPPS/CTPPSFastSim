@@ -3,7 +3,7 @@ import math
 
 #common stuff here
 det1 = 203.827   #position of first tracker detector
-det2 = 215.550
+det2 = 212.550
 tof  = 215.7   #position of time of flight detector
 trklen = 10.
 hit_smear= True
@@ -63,19 +63,20 @@ def customise(process):
 	ppssim_tofDiamond = cms.PSet(
                          ToFGeometry       = cms.string("diamond"),
                          ToFCellWidth      = cms.untracked.vdouble(0.81, 0.91, 1.02, 1.16, 1.75, 2.35, 4.2, 4.2), # tof cell width in mm #move to vector - diamond geometry
+                         ToFCellHeight     = cms.double(4.2), # tof cell height in mm
                          ToFNCellX         = cms.int32(8),      # number of cells in X
                          ToFNCellY         = cms.int32(1),      # number of cells in Y
                          )
 	ppssim_tofQuartz = cms.PSet(
                          ToFGeometry       = cms.string("quartz"),
                          ToFCellWidth      = cms.untracked.vdouble(3.0), # tof cell width in mm #move to vector - diamond geometry
+                         ToFCellHeight     = cms.double(3.0), # tof cell height in mm
                          ToFNCellX         = cms.int32(5),      # number of cells in X
                          ToFNCellY         = cms.int32(4),      # number of cells in Y
                          )
 	ppssim_detector_options = cms.PSet(
                          TrackerWidth      = cms.double(20.0), # tracker width in mm
                          TrackerHeight     = cms.double(18.0), # tracker height in mm
-                         ToFCellHeight     = cms.double(4.2), # tof cell height in mm
                          ToFPitchX         = cms.double(100),  # pitch between cells in X in microns
                          ToFPitchY         = cms.double(100),  # pitch between cells in Y in microns
                          TrackerInsertion  = cms.double(15), # Number of sigmas (X) from the beam for the tracker
