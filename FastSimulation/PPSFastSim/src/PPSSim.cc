@@ -106,7 +106,7 @@ void PPSSim::BeginRun()
     fReco= new PPSSpectrometer<Reco>();
     //
     PPSTrkDetector* det1 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk1);
-    PPSTrkDetector* det2 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk1);
+    PPSTrkDetector* det2 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk2);
 
     std::cout << fToFNCellX << " ----------------------  "  << fToFGeometry << std::endl; 
     TrkStation_F = new std::pair<PPSTrkDetector,PPSTrkDetector>(*det1,*det2);
@@ -120,7 +120,7 @@ void PPSSim::BeginRun()
         ToFDet_F  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW_,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
         ToFDet_B  = new PPSToFDetector(fToFNCellX,fToFNCellY,fToFCellW_,fToFCellH,fToFPitchX,fToFPitchY,fToFInsertion*fBeamXRMS_ToF,fTimeSigma);
     }
-    det1 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk2);
+    det1 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk1);
     det2 = new PPSTrkDetector(fTrackerWidth,fTrackerHeight,fTrackerInsertion*fBeamXRMS_Trk2);
     TrkStation_B = new std::pair<PPSTrkDetector,PPSTrkDetector>(*det1,*det2);
      
