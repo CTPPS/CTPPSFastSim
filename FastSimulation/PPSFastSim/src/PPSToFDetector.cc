@@ -12,7 +12,7 @@ PPSToFDetector::PPSToFDetector(int ncellx,int ncelly, std::vector<double>& cellw
         else x1 = -DetPosition+DetW; //DetPosition - shift the limit of a column depending on the detector position
         x2 = x1-CellW.at(i);
         DetW += (x2-x1)-PitchX; 
-         std::cout << i << " - DetPosition: " << DetPosition << " - DetW: "   << DetW << " - CellW: "  << CellW.at(i) <<  " - x1: "  << x1 << " - x2: "  << x2 << std::endl;  
+        //std::cout << i << " - DetPosition: " << DetPosition << " - DetW: "   << DetW << " - CellW: "  << CellW.at(i) <<  " - x1: "  << x1 << " - x2: "  << x2 << std::endl;  
         CellColumn.push_back(std::pair<double,double>(x1,x2));
      }
 //diamond geometry
