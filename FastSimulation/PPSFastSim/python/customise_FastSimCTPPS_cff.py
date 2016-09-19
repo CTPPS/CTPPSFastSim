@@ -3,9 +3,9 @@ import math
 
 #common stuff here
 det1 = 203.8   #position of first tracker detector
-det2 = 215.
+det2 = 212.550
 tof  = 215.5   #position of time of flight detector
-trklen = 10.
+trklen = det2-det1
 hit_smear= True
 Ang_smear= True
 E_smear = True
